@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Magic Escape — Assignment 5</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=MedievalSharp&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════════════════════════
+           ROOT & BASE
+        ═══════════════════════════════════ */
+        :root {
+            --stone:     #1a1410;
+            --stone-2:   #241e18;
+            --stone-3:   #2e2720;
+            --stone-4:   #3a3028;
+            --border:    rgba(180,140,60,0.25);
+            --gold:      #c9a84c;
+            --gold-lt:   #e8c96a;
+            --magic:     #7c4dff;
+            --magic-lt:  #b39dff;
+            --green:     #00c853;
+            --red:       #ff3d3d;
+            --txt1:      #f0e6d0;
+            --txt2:      #a89070;
+            --txt3:      #6a5840;
+            --font-title: 'Cinzel', serif;
+            --font-body:  'IM Fell English', Georgia, serif;
+            --font-mono:  'JetBrains Mono', monospace;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--stone);
+            color: var(--txt1);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Stone texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(0,0,0,0.03) 40px, rgba(0,0,0,0.03) 41px),
+                repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(0,0,0,0.02) 60px, rgba(0,0,0,0.02) 61px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .page-wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 860px;
+            margin: 0 auto;
+            padding: 0 20px 80px;
+        }
+
+        /* ═══════════════════════════════════
+           HEADER
+        ═══════════════════════════════════ */
+        .site-header {
+            text-align: center;
+            padding: 52px 20px 40px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .site-header::after {
+            content: '✦ ✦ ✦';
+            display: block;
+            color: var(--gold);
+            font-size: 0.9em;
+            letter-spacing: 12px;
+            margin-top: 16px;
+            opacity: 0.6;
+        }
+
+        .header-eyebrow {
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            color: var(--txt3);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 16px;
+        }
+
+        .header-title {
+            font-family: var(--font-title);
+            font-size: clamp(2em, 6vw, 3.2em);
+            font-weight: 700;
+            color: var(--gold-lt);
+            letter-spacing: 2px;
+            line-height: 1.15;
+            margin-bottom: 16px;
+            text-shadow: 0 0 40px rgba(201,168,76,0.3);
+        }
+
+        .header-subtitle {
+            font-style: italic;
+            color: var(--txt2);
+            font-size: 1.05em;
+            line-height: 1.7;
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        /* ═══════════════════════════════════
+           STORY INTRO
+        ═══════════════════════════════════ */
+        .story-scroll {
+            background: var(--stone-2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 28px 32px;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .story-scroll::before {
+            content: '📜';
+            font-size: 1.4em;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .story-scroll-title {
+            font-family: var(--font-title);
+            font-size: 0.85em;
+            letter-spacing: 2px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .story-scroll p {
+            font-style: italic;
+            color: var(--txt2);
+            line-height: 1.85;
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+
+        .story-scroll p:last-child { margin-bottom: 0; }
+
+        .story-scroll strong { color: var(--txt1); font-style: normal; }
+
+        /* ═══════════════════════════════════
+           PUZZLE CARDS
+        ═══════════════════════════════════ */
+        .puzzle-card {
+            background: var(--stone-2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 32px;
+            overflow: hidden;
+        }
+
+        .puzzle-header {
+            background: var(--stone-3);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .puzzle-num {
+            font-family: var(--font-title);
+            font-size: 0.7em;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: var(--stone);
+            background: var(--gold);
+            padding: 4px 12px;
+            border-radius: 2px;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .puzzle-title-row {
+            flex: 1;
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .puzzle-title {
+            font-family: var(--font-title);
+            font-size: 1em;
+            font-weight: 600;
+            color: var(--txt1);
+            letter-spacing: 0.5px;
+        }
+
+        .puzzle-pts {
+            font-family: var(--font-mono);
+            font-size: 0.75em;
+            color: var(--gold);
+            white-space: nowrap;
+        }
+
+        .puzzle-body {
+            padding: 24px 28px;
+        }
+
+        /* Story beat */
+        .story-beat {
+            background: rgba(201,168,76,0.06);
+            border-left: 3px solid var(--gold);
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            border-radius: 0 3px 3px 0;
+            font-style: italic;
+            color: var(--txt2);
+            font-size: 0.95em;
+            line-height: 1.7;
+        }
+
+        /* Task box */
+        .task-box {
+            background: rgba(124,77,255,0.06);
+            border: 1px solid rgba(124,77,255,0.2);
+            border-radius: 3px;
+            padding: 16px 18px;
+            margin-bottom: 20px;
+        }
+
+        .task-box-label {
+            font-family: var(--font-mono);
+            font-size: 0.68em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--magic-lt);
+            margin-bottom: 8px;
+        }
+
+        .task-box p {
+            font-size: 0.92em;
+            color: var(--txt1);
+            line-height: 1.7;
+            margin-bottom: 6px;
+        }
+
+        .task-box p:last-child { margin-bottom: 0; }
+
+        .task-box code {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            background: rgba(124,77,255,0.15);
+            color: var(--magic-lt);
+            padding: 1px 6px;
+            border-radius: 3px;
+        }
+
+        .task-box ul {
+            padding-left: 18px;
+            font-size: 0.92em;
+            color: var(--txt1);
+            line-height: 1.75;
+        }
+
+        .task-box ul li { margin-bottom: 4px; }
+
+        /* ═══════════════════════════════════
+           PUZZLE SCENES (visual areas)
+        ═══════════════════════════════════ */
+        .scene-area {
+            background: var(--stone-4);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+            min-height: 120px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        /* P1 — Prison Gate */
+        #prisonGate {
+            font-size: 4em;
+            display: block;
+            transition: all 0.5s ease;
+            filter: drop-shadow(0 0 12px rgba(201,168,76,0.3));
+        }
+
+        .gate-label {
+            font-family: var(--font-title);
+            font-size: 0.8em;
+            color: var(--txt3);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* P2 — Secret Scroll */
+        .scroll-container {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 16px 20px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .scroll-label {
+            font-family: var(--font-title);
+            font-size: 0.72em;
+            letter-spacing: 2px;
+            color: var(--txt3);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        #secretMessage {
+            font-style: italic;
+            color: var(--txt3);
+            font-size: 0.95em;
+            min-height: 28px;
+            transition: all 0.4s ease;
+        }
+
+        /* P3 — Corridor Door */
+        #corridorDoor {
+            font-size: 3.5em;
+            transition: all 0.4s ease;
+            filter: drop-shadow(0 0 8px rgba(124,77,255,0.2));
+        }
+
+        .door-status {
+            font-family: var(--font-mono);
+            font-size: 0.75em;
+            color: var(--txt3);
+            letter-spacing: 1px;
+        }
+
+        .door-status.unlocked {
+            color: var(--green);
+        }
+
+        /* P4 — Ancient Map */
+        #mapContainer {
+            width: 100%;
+            max-width: 380px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border);
+            border-radius: 3px;
+            padding: 16px 20px;
+            min-height: 80px;
+            font-size: 0.88em;
+            color: var(--txt2);
+            font-style: italic;
+            text-align: left;
+            line-height: 1.65;
+        }
+
+        #mapContainer.loading {
+            color: var(--magic-lt);
+            font-style: normal;
+            font-family: var(--font-mono);
+            font-size: 0.8em;
+        }
+
+        #mapContainer.loaded {
+            color: var(--txt1);
+            font-style: italic;
+            border-color: rgba(124,77,255,0.4);
+        }
+
+        /* ═══════════════════════════════════
+           CODE EDITOR AREA
+        ═══════════════════════════════════ */
+        .code-section {
+            margin-bottom: 20px;
+        }
+
+        .code-label {
+            font-family: var(--font-mono);
+            font-size: 0.68em;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--txt3);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .code-label::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        textarea.spell-input {
+            width: 100%;
+            background: #0d1117;
+            border: 1px solid rgba(124,77,255,0.25);
+            border-radius: 3px;
+            color: #e6edf3;
+            font-family: var(--font-mono);
+            font-size: 0.88em;
+            line-height: 1.8;
+            padding: 16px 18px;
+            resize: vertical;
+            min-height: 120px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        textarea.spell-input:focus {
+            border-color: rgba(124,77,255,0.6);
+        }
+
+        textarea.spell-input::placeholder {
+            color: #3a3a5a;
+        }
+
+        /* ═══════════════════════════════════
+           CAST SPELL BUTTON + FEEDBACK
+        ═══════════════════════════════════ */
+        .spell-actions {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .cast-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 26px;
+            background: linear-gradient(135deg, #4a1d9e, #7c4dff);
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-family: var(--font-title);
+            font-size: 0.82em;
+            font-weight: 600;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 16px rgba(124,77,255,0.3);
+        }
+
+        .cast-btn:hover {
+            filter: brightness(1.15);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 22px rgba(124,77,255,0.45);
+        }
+
+        .cast-btn:active { transform: translateY(0); }
+
+        .spell-feedback {
+            font-family: var(--font-mono);
+            font-size: 0.82em;
+            padding: 8px 14px;
+            border-radius: 3px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-weight: 500;
+        }
+
+        .spell-feedback.show { opacity: 1; }
+
+        .spell-feedback.success {
+            background: rgba(0,200,83,0.12);
+            color: var(--green);
+            border: 1px solid rgba(0,200,83,0.25);
+        }
+
+        .spell-feedback.error {
+            background: rgba(255,61,61,0.1);
+            color: var(--red);
+            border: 1px solid rgba(255,61,61,0.2);
+        }
+
+        /* ═══════════════════════════════════
+           HINT BOX
+        ═══════════════════════════════════ */
+        .hint-toggle {
+            background: none;
+            border: 1px solid var(--border);
+            color: var(--txt3);
+            font-family: var(--font-mono);
+            font-size: 0.72em;
+            padding: 5px 14px;
+            border-radius: 3px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.15s;
+        }
+
+        .hint-toggle:hover { color: var(--txt2); border-color: var(--gold); }
+
+        .hint-content {
+            display: none;
+            background: rgba(201,168,76,0.05);
+            border: 1px solid rgba(201,168,76,0.15);
+            border-radius: 3px;
+            padding: 12px 16px;
+            margin-top: 10px;
+            font-size: 0.88em;
+            color: var(--txt2);
+            line-height: 1.7;
+            font-style: italic;
+        }
+
+        .hint-content code {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            background: rgba(201,168,76,0.1);
+            color: var(--gold-lt);
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-style: normal;
+        }
+
+        /* ═══════════════════════════════════
+           PROGRESS BAR
+        ═══════════════════════════════════ */
+        .progress-wrap {
+            background: var(--stone-2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 20px 24px;
+            margin-bottom: 36px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .progress-label {
+            font-family: var(--font-title);
+            font-size: 0.78em;
+            letter-spacing: 1px;
+            color: var(--txt2);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .progress-track {
+            flex: 1;
+            height: 6px;
+            background: var(--stone-4);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--magic), var(--gold));
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .progress-count {
+            font-family: var(--font-mono);
+            font-size: 0.8em;
+            color: var(--gold);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* ═══════════════════════════════════
+           ASSIGNMENT INFO PANEL
+        ═══════════════════════════════════ */
+        .info-panel {
+            background: var(--stone-2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 24px 28px;
+            margin-bottom: 36px;
+        }
+
+        .info-panel-title {
+            font-family: var(--font-title);
+            font-size: 0.82em;
+            letter-spacing: 2px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-panel-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .info-item {
+            font-size: 0.88em;
+            color: var(--txt2);
+            line-height: 1.6;
+        }
+
+        .info-item strong { color: var(--txt1); display: block; font-family: var(--font-title); font-size: 0.85em; letter-spacing: 0.5px; margin-bottom: 2px; }
+
+        /* ═══════════════════════════════════
+           SUBMISSION SECTION
+        ═══════════════════════════════════ */
+        .submission-box {
+            background: var(--stone-2);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 24px 28px;
+            margin-top: 40px;
+        }
+
+        .submission-title {
+            font-family: var(--font-title);
+            font-size: 0.85em;
+            letter-spacing: 2px;
+            color: var(--gold);
+            text-transform: uppercase;
+            margin-bottom: 14px;
+        }
+
+        .submission-box p {
+            font-size: 0.9em;
+            color: var(--txt2);
+            line-height: 1.75;
+            margin-bottom: 8px;
+        }
+
+        .submission-box code {
+            font-family: var(--font-mono);
+            font-size: 0.85em;
+            background: rgba(201,168,76,0.1);
+            color: var(--gold-lt);
+            padding: 1px 6px;
+            border-radius: 3px;
+        }
+
+        /* ═══════════════════════════════════
+           RESPONSIVE
+        ═══════════════════════════════════ */
+        @media (max-width: 600px) {
+            .info-grid { grid-template-columns: 1fr; }
+            .puzzle-body { padding: 18px 16px; }
+        }
+    </style>
+</head>
+<body>
+<div class="page-wrap">
+
+    <!-- HEADER -->
+    <header class="site-header">
+        <div class="header-eyebrow">Intro to Media Applications · Assignment 5</div>
+        <h1 class="header-title">⚔️ The Magic Escape</h1>
+        <p class="header-subtitle">In this world, JavaScript is magic. Cast your spells wisely — freedom awaits on the other side of the dungeon wall.</p>
+    </header>
+
+    <!-- PROGRESS -->
+    <div class="progress-wrap">
+        <span class="progress-label">⚗️ Escape Progress</span>
+        <div class="progress-track">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <span class="progress-count" id="progressCount">0 / 4 spells cast</span>
+    </div>
+
+    <!-- STORY INTRO -->
+    <div class="story-scroll">
+        <div class="story-scroll-title">📜 The Prophecy</div>
+        <p>You open your eyes. Cold stone beneath you. Iron bars ahead. The last thing you remember is a blinding light — and then nothing.</p>
+        <p>A voice echoes through the dungeon walls: <strong>"You have been reincarnated into the Realm of Syntax. Here, magic is written in JavaScript. Those who can command the DOM shall be free. Those who cannot... remain."</strong></p>
+        <p>You look at your hands. In them, glowing faintly: a <strong>code editor</strong>. Four puzzles stand between you and the exit. Each one requires a spell. Write the correct JavaScript — and the world will bend to your will.</p>
+        <p><em>The dungeon groans. Your escape begins now.</em></p>
+    </div>
+
+    <!-- INFO PANEL -->
+    <div class="info-panel">
+        <div class="info-panel-title">Assignment Details</div>
+        <div class="info-grid">
+            <div class="info-item"><strong>Total Points</strong>20 points</div>
+            <div class="info-item"><strong>Submit To</strong>Canvas — GitHub repo link</div>
+            <div class="info-item"><strong>Files to Submit</strong><code>index.html</code> only</div>
+            <div class="info-item"><strong>GitHub Repo Name</strong><code>sp26-assignment5-magic</code></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════
+         PUZZLE 1 — PRISON GATE
+    ═══════════════════════ -->
+    <div class="puzzle-card" id="puzzle1Card">
+        <div class="puzzle-header">
+            <span class="puzzle-num">Spell I</span>
+            <div class="puzzle-title-row">
+                <h2 class="puzzle-title">Vanish the Iron Gate</h2>
+                <span class="puzzle-pts">4 pts</span>
+            </div>
+        </div>
+        <div class="puzzle-body">
+
+            <div class="story-beat">
+                The iron gate before you is massive — ancient rust clinging to its bars. A carved inscription above it reads: <em>"That which cannot be seen cannot confine."</em> You raise your hands. The magic flows. The gate must disappear.
+            </div>
+
+            <div class="task-box">
+                <div class="task-box-label">✦ Your Spell</div>
+                <p>Write JavaScript that makes <code>#prisonGate</code> invisible when the "Cast Spell" button is clicked.</p>
+                <ul>
+                    <li>Select the element with <code>document.getElementById()</code></li>
+                    <li>Change its <code>style.display</code> to <code>'none'</code></li>
+                    <li>Your code goes in the textarea below — inside the <code>castSpell1()</code> function body</li>
+                </ul>
+            </div>
+
+            <!-- SCENE -->
+            <div class="scene-area">
+                <span id="prisonGate">🚪</span>
+                <span class="gate-label">The Iron Gate</span>
+            </div>
+
+            <!-- CODE INPUT -->
+            <div class="code-section">
+                <div class="code-label">✦ Write your spell here</div>
+                <textarea class="spell-input" id="spellInput1" rows="5" placeholder="// Write your JavaScript here
+// Make the prison gate vanish
+// Hint: Use document.getElementById() and .style.display"></textarea>
+            </div>
+
+            <!-- HINT -->
+            <div style="margin-bottom: 16px;">
+                <button class="hint-toggle" onclick="toggleHint('hint1')">🔮 Reveal Hint</button>
+                <div class="hint-content" id="hint1">
+                    The element you need has the id <code>prisonGate</code>. Select it with <code>document.getElementById('prisonGate')</code>, then set its <code>style.display</code> property to the string <code>'none'</code>.
+                </div>
+            </div>
+
+            <!-- CAST BUTTON -->
+            <div class="spell-actions">
+                <button class="cast-btn" onclick="castSpell1()">✨ Cast Spell</button>
+                <span class="spell-feedback" id="feedback1"></span>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ═══════════════════════
+         PUZZLE 2 — SECRET SCROLL
+    ═══════════════════════ -->
+    <div class="puzzle-card" id="puzzle2Card">
+        <div class="puzzle-header">
+            <span class="puzzle-num">Spell II</span>
+            <div class="puzzle-title-row">
+                <h2 class="puzzle-title">Read the Guard's Secret Scroll</h2>
+                <span class="puzzle-pts">4 pts</span>
+            </div>
+        </div>
+        <div class="puzzle-body">
+
+            <div class="story-beat">
+                The guard left in a hurry. On the floor — a rolled scroll, sealed with wax. But the message is written in invisible ink. A nearby spell inscription says: <em>"The truth is already in the page. You need only reveal it."</em> The hidden message contains the exit code.
+            </div>
+
+            <div class="task-box">
+                <div class="task-box-label">✦ Your Spell</div>
+                <p>Write JavaScript that reveals a hidden message inside <code>#secretMessage</code>.</p>
+                <ul>
+                    <li>Select <code>#secretMessage</code> using <code>document.getElementById()</code></li>
+                    <li>Set its <code>innerHTML</code> to: <code>"🗝️ Exit code: SYNTAX-9"</code></li>
+                    <li>Also change its <code>style.color</code> to <code>'#e8c96a'</code> so it glows gold</li>
+                </ul>
+            </div>
+
+            <!-- SCENE -->
+            <div class="scene-area">
+                <div class="scroll-container">
+                    <div class="scroll-label">📜 The Guard's Scroll</div>
+                    <div id="secretMessage">[ The scroll appears blank... ]</div>
+                </div>
+            </div>
+
+            <!-- CODE INPUT -->
+            <div class="code-section">
+                <div class="code-label">✦ Write your spell here</div>
+                <textarea class="spell-input" id="spellInput2" rows="6" placeholder="// Reveal the hidden message
+// Select #secretMessage and set its innerHTML
+// Then change its color to gold"></textarea>
+            </div>
+
+            <!-- HINT -->
+            <div style="margin-bottom: 16px;">
+                <button class="hint-toggle" onclick="toggleHint('hint2')">🔮 Reveal Hint</button>
+                <div class="hint-content" id="hint2">
+                    Use <code>document.getElementById('secretMessage')</code> to grab the element. Then set <code>.innerHTML</code> to the message string and <code>.style.color</code> to the gold hex value.
+                </div>
+            </div>
+
+            <!-- CAST BUTTON -->
+            <div class="spell-actions">
+                <button class="cast-btn" onclick="castSpell2()">✨ Cast Spell</button>
+                <span class="spell-feedback" id="feedback2"></span>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ═══════════════════════
+         PUZZLE 3 — CORRIDOR DOOR
+    ═══════════════════════ -->
+    <div class="puzzle-card" id="puzzle3Card">
+        <div class="puzzle-header">
+            <span class="puzzle-num">Spell III</span>
+            <div class="puzzle-title-row">
+                <h2 class="puzzle-title">Unlock the Corridor Door</h2>
+                <span class="puzzle-pts">5 pts</span>
+            </div>
+        </div>
+        <div class="puzzle-body">
+
+            <div class="story-beat">
+                A heavy wooden door blocks the corridor. It does not open with force — it opens with a spoken command. The runes carved into its frame pulse faintly. <em>"Speak the unlock word three times and I shall yield,"</em> they seem to say. But in this realm, speaking means clicking.
+            </div>
+
+            <div class="task-box">
+                <div class="task-box-label">✦ Your Spell</div>
+                <p>Write JavaScript that adds a <code>click</code> event listener to the <code>#corridorDoor</code> element.</p>
+                <ul>
+                    <li>Use <code>addEventListener('click', function() {...})</code></li>
+                    <li>Inside the listener, toggle the CSS class <code>unlocked</code> on the door element using <code>classList.toggle()</code></li>
+                    <li>Also toggle the door emoji: when unlocked show <code>🔓</code>, when locked show <code>🔒</code></li>
+                    <li>Update <code>#doorStatus</code> text: <code>"UNLOCKED — You may pass"</code> or <code>"LOCKED"</code></li>
+                </ul>
+            </div>
+
+            <!-- SCENE -->
+            <div class="scene-area">
+                <div id="corridorDoor" style="font-size:3.5em; cursor:pointer; user-select:none;">🔒</div>
+                <div class="door-status" id="doorStatus">LOCKED</div>
+                <div style="font-size:0.75em; color:var(--txt3); font-family:var(--font-mono);">( click the door once your spell is cast )</div>
+            </div>
+
+            <!-- CODE INPUT -->
+            <div class="code-section">
+                <div class="code-label">✦ Write your spell here</div>
+                <textarea class="spell-input" id="spellInput3" rows="10" placeholder="// Add a click event listener to #corridorDoor
+// Toggle the 'unlocked' class
+// Update the emoji and #doorStatus text based on state"></textarea>
+            </div>
+
+            <!-- HINT -->
+            <div style="margin-bottom: 16px;">
+                <button class="hint-toggle" onclick="toggleHint('hint3')">🔮 Reveal Hint</button>
+                <div class="hint-content" id="hint3">
+                    Select the door with <code>getElementById</code>. Then: <code>door.addEventListener('click', function() { door.classList.toggle('unlocked'); })</code>. Check if it's unlocked with <code>door.classList.contains('unlocked')</code> — use that to decide which emoji and text to show.
+                </div>
+            </div>
+
+            <!-- CAST BUTTON -->
+            <div class="spell-actions">
+                <button class="cast-btn" onclick="castSpell3()">✨ Cast Spell</button>
+                <span class="spell-feedback" id="feedback3"></span>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- ═══════════════════════
+         PUZZLE 4 — ANCIENT MAP
+    ═══════════════════════ -->
+    <div class="puzzle-card" id="puzzle4Card">
+        <div class="puzzle-header">
+            <span class="puzzle-num">Spell IV</span>
+            <div class="puzzle-title-row">
+                <h2 class="puzzle-title">Summon the Ancient Map</h2>
+                <span class="puzzle-pts">7 pts</span>
+            </div>
+        </div>
+        <div class="puzzle-body">
+
+            <div class="story-beat">
+                The final door looms ahead. But it will only open for those who hold the ancient map — a document so old it exists only in the ethereal library of the Great API. No mortal can carry it. It must be <em>fetched</em> from the beyond using the most powerful async spell known to this realm.
+            </div>
+
+            <div class="task-box">
+                <div class="task-box-label">✦ Your Spell</div>
+                <p>Write an <code>async</code> function called <code>summonMap()</code> that fetches data from an external API and displays it in <code>#mapContainer</code>.</p>
+                <ul>
+                    <li>Use this API URL: <code>https://official-joke-api.appspot.com/random_joke</code></li>
+                    <li>The API returns an object with <code>setup</code> and <code>punchline</code> properties</li>
+                    <li>While fetching, set <code>#mapContainer</code> text to <code>"⏳ Summoning from the ethereal library..."</code> and add class <code>loading</code></li>
+                    <li>When data arrives, display: <code>"📜 Ancient wisdom: [setup] ... [punchline]"</code></li>
+                    <li>Remove class <code>loading</code> and add class <code>loaded</code></li>
+                    <li>Wrap in <code>try/catch</code> — if fetch fails, show <code>"❌ The ethereal library is unreachable."</code></li>
+                    <li>Call <code>summonMap()</code> when the Cast Spell button is clicked</li>
+                </ul>
+            </div>
+
+            <!-- SCENE -->
+            <div class="scene-area">
+                <div id="mapContainer">
+                    [ The ancient map has not yet been summoned... ]
+                </div>
+            </div>
+
+            <!-- CODE INPUT -->
+            <div class="code-section">
+                <div class="code-label">✦ Write your spell here</div>
+                <textarea class="spell-input" id="spellInput4" rows="14" placeholder="// Write an async function called summonMap()
+// Use fetch() with await to call the joke API
+// Show loading state, then display the result
+// Use try/catch for error handling
+// Call summonMap() at the end"></textarea>
+            </div>
+
+            <!-- HINT -->
+            <div style="margin-bottom: 16px;">
+                <button class="hint-toggle" onclick="toggleHint('hint4')">🔮 Reveal Hint</button>
+                <div class="hint-content" id="hint4">
+                    Structure: <code>async function summonMap() { try { const res = await fetch(url); const data = await res.json(); /* use data.setup and data.punchline */ } catch(e) { /* show error */ } }</code>. Don't forget to call <code>summonMap()</code> at the end of your spell.
+                </div>
+            </div>
+
+            <!-- CAST BUTTON -->
+            <div class="spell-actions">
+                <button class="cast-btn" onclick="castSpell4()">✨ Cast Spell</button>
+                <span class="spell-feedback" id="feedback4"></span>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- SUBMISSION -->
+    <div class="submission-box">
+        <div class="submission-title">⚔️ Submit Your Escape</div>
+        <p>Once all four spells are cast and working, push your file to GitHub and submit the repository link on Canvas.</p>
+        <p><strong>Repository name:</strong> <code>sp26-assignment5-magic</code></p>
+        <p><strong>Make sure:</strong> your repository is set to <strong>Public</strong> and you have added <code>rubale</code> as a collaborator.</p>
+        <p><strong>Submit:</strong> only <code>index.html</code> needs to be in the repo — no other files required.</p>
+        <p style="margin-top: 12px; font-style: italic; color: var(--txt3); font-size: 0.85em;">⚠️ Do not modify the HTML structure or the grading functions at the bottom of the file. Only write code inside the textarea areas or the designated spell functions.</p>
+    </div>
+
+</div><!-- /page-wrap -->
+
+
+<!-- ═══════════════════════════════════════════════
+     GRADING & SPELL ENGINE — Do not modify below
+═══════════════════════════════════════════════ -->
+<script>
+
+    // ── Progress tracking ──────────────────────────
+    const spellsCast = [false, false, false, false];
+
+    function updateProgress() {
+        const done = spellsCast.filter(Boolean).length;
+        document.getElementById('progressFill').style.width = (done / 4 * 100) + '%';
+        document.getElementById('progressCount').textContent = `${done} / 4 spells cast`;
+    }
+
+    // ── Hint toggle ────────────────────────────────
+    function toggleHint(id) {
+        const el = document.getElementById(id);
+        el.style.display = el.style.display === 'block' ? 'none' : 'block';
+    }
+
+    // ── Feedback helper ────────────────────────────
+    function showFeedback(id, success, message) {
+        const el = document.getElementById(id);
+        el.textContent = message;
+        el.className = 'spell-feedback show ' + (success ? 'success' : 'error');
+        setTimeout(() => { if (!success) el.className = 'spell-feedback'; }, 3000);
+    }
+
+    // ── SPELL 1: Vanish the gate ───────────────────
+    function castSpell1() {
+        const code = document.getElementById('spellInput1').value.trim();
+        if (!code) { showFeedback('feedback1', false, '❌ Your spell is empty — write some code first'); return; }
+        try {
+            // Reset gate first
+            document.getElementById('prisonGate').style.display = '';
+            eval(code);
+            const gate = document.getElementById('prisonGate');
+            if (gate.style.display === 'none') {
+                showFeedback('feedback1', true, '✅ The gate vanishes! Path is clear.');
+                spellsCast[0] = true;
+                updateProgress();
+            } else {
+                showFeedback('feedback1', false, '❌ The gate still stands. Check your spell.');
+            }
+        } catch(e) {
+            showFeedback('feedback1', false, '❌ Spell error: ' + e.message);
+        }
+    }
+
+    // ── SPELL 2: Reveal the scroll ─────────────────
+    function castSpell2() {
+        const code = document.getElementById('spellInput2').value.trim();
+        if (!code) { showFeedback('feedback2', false, '❌ Your spell is empty — write some code first'); return; }
+        try {
+            document.getElementById('secretMessage').innerHTML = '[ The scroll appears blank... ]';
+            document.getElementById('secretMessage').style.color = '';
+            eval(code);
+            const msg = document.getElementById('secretMessage');
+            if (msg.innerHTML.includes('SYNTAX-9') && msg.style.color !== '') {
+                showFeedback('feedback2', true, '✅ The message glows! Exit code revealed.');
+                spellsCast[1] = true;
+                updateProgress();
+            } else if (msg.innerHTML.includes('SYNTAX-9')) {
+                showFeedback('feedback2', false, '⚠️ Message revealed but missing the gold color.');
+            } else {
+                showFeedback('feedback2', false, '❌ The scroll remains blank. Check your innerHTML.');
+            }
+        } catch(e) {
+            showFeedback('feedback2', false, '❌ Spell error: ' + e.message);
+        }
+    }
+
+    // ── SPELL 3: Unlock the door ───────────────────
+    function castSpell3() {
+        const code = document.getElementById('spellInput3').value.trim();
+        if (!code) { showFeedback('feedback3', false, '❌ Your spell is empty — write some code first'); return; }
+        try {
+            // Reset door
+            const door = document.getElementById('corridorDoor');
+            door.className = '';
+            door.textContent = '🔒';
+            door.replaceWith(door.cloneNode(true)); // remove old listeners
+            // Re-select after clone
+            eval(code);
+            // Check listener was added by simulating a click
+            const freshDoor = document.getElementById('corridorDoor');
+            freshDoor.click();
+            setTimeout(() => {
+                if (freshDoor.classList.contains('unlocked') || freshDoor.textContent === '🔓') {
+                    showFeedback('feedback3', true, '✅ The door creaks open! You may pass.');
+                    spellsCast[2] = true;
+                    updateProgress();
+                } else {
+                    showFeedback('feedback3', false, '❌ The door remains shut. Check your event listener.');
+                }
+            }, 100);
+        } catch(e) {
+            showFeedback('feedback3', false, '❌ Spell error: ' + e.message);
+        }
+    }
+
+    // ── SPELL 4: Summon the map (async) ───────────
+    function castSpell4() {
+        const code = document.getElementById('spellInput4').value.trim();
+        if (!code) { showFeedback('feedback4', false, '❌ Your spell is empty — write some code first'); return; }
+        document.getElementById('mapContainer').textContent = '[ The ancient map has not yet been summoned... ]';
+        document.getElementById('mapContainer').className = '';
+        try {
+            eval(code);
+            // Check after a delay to allow async to complete
+            setTimeout(() => {
+                const container = document.getElementById('mapContainer');
+                const text = container.textContent;
+                if (text.includes('Ancient wisdom') || container.classList.contains('loaded')) {
+                    showFeedback('feedback4', true, '✅ The ancient map materializes! The exit is near.');
+                    spellsCast[3] = true;
+                    updateProgress();
+                } else if (text.includes('Summoning')) {
+                    showFeedback('feedback4', false, '⏳ Still loading... wait a moment and try again.');
+                } else if (text.includes('unreachable')) {
+                    showFeedback('feedback4', false, '⚠️ API unreachable — check your fetch URL and try again.');
+                } else {
+                    showFeedback('feedback4', false, '❌ The map did not appear. Check your async function.');
+                }
+            }, 2500);
+        } catch(e) {
+            showFeedback('feedback4', false, '❌ Spell error: ' + e.message);
+        }
+    }
+
+    // ── Init ───────────────────────────────────────
+    updateProgress();
+
+</script>
+
+</body>
+</html>
